@@ -515,23 +515,23 @@ if __name__ == "__main__":
 ## ✅ 完成检查清单
 
 ### 理论部分
-- [ ] 理解 LLM 基本原理（能向别人解释）
-- [ ] 会计算 Token 数量
-- [ ] 理解上下文窗口限制
-- [ ] 掌握 5 个关键参数的作用
-- [ ] 能用 5 种 Prompt 技巧
+- [x] 理解 LLM 基本原理（能向别人解释）
+- [x] 会计算 Token 数量
+- [x] 理解上下文窗口限制
+- [x] 掌握 5 个关键参数的作用
+- [x] 能用 5 种 Prompt 技巧
 
 ### 实践部分
-- [ ] Python 环境搭建完成
-- [ ] 成功调用 API
-- [ ] 完成参数对比实验
-- [ ] 完成 2 个练习
-- [ ] 代码能独立运行
+- [x] Python 环境搭建完成
+- [x] 成功调用 API
+- [x] 完成参数对比实验
+- [x] 完成 2 个练习
+- [x] 代码能独立运行
 
 ### 代码提交
-- [ ] 代码提交到 Git
-- [ ] 记录学习笔记
-- [ ] 标记遇到的问题
+- [x] 代码提交到 Git
+- [x] 记录学习笔记
+- [x] 标记遇到的问题
 
 ---
 
@@ -541,17 +541,35 @@ if __name__ == "__main__":
 ## Day 1 学习心得
 
 ### 新知识
-1. 
-2. 
-3. 
+1. LLM 内部原理： tokenizer->embedding->tranformer->softmax->output
+2. LLM 5个关键参数：temperature，top_p(核采样), frequence_penalty...
+3. 5 个Prompt技术：zero-shot, few-shot, role-prompting, Cot, system-message.
+4. openapi sdk 调用 minimax 模型。
 
 ### 遇到的问题
-1. 
-   解决方案：
+1. MiniMax 模型会在响应中包含 `<thinking>...</thinking>` 标签标记思考过程。
+   解决方案：1. 用 `re` 提取; 2. 用 Anthropic 包，原生支持区分内容类型。
 
 ### 代码片段
 ```python
-# 最有用的代码
+from anthropic import Anthropic
+
+client = Anthropic(
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
+    base_url="https://api.minimaxi.com/anthropic"
+)
+
+response = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "你好"}]
+)
+
+for block in response.content:
+    if block.type == "thinking":
+        print(f"思考: {block.thinking}")
+    elif block.type == "text":
+        print(f"回复: {block.text}")
 ```
 
 ### 明日改进

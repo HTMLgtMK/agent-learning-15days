@@ -1,9 +1,9 @@
 # Day 2 - Agent 核心概念与 LangChain 入门
 
-**日期**: 2026-04-01（周二）  
+**日期**: 2026-04-01（周二） → 2026-04-03（周四）  
 **预计时间**: 5-6 小时  
 **难度**: ⭐⭐⭐  
-**状态**: 📚 深入学习版
+**状态**: ✅ 已完成
 
 ---
 
@@ -277,7 +277,7 @@ python -c "import langchain; print(langchain.__version__)"
 
 ```python
 from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage
+from langchain.messages import HumanMessage
 
 # 初始化 LLM
 llm = ChatOpenAI(
@@ -298,7 +298,7 @@ for chunk in llm.stream([HumanMessage(content="讲个笑话")]):
 ##### Prompt Templates
 
 ```python
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 # 定义模板
 template = """你是一位{role}，专门帮助用户{task}。
@@ -420,13 +420,13 @@ for t in tools:
 #### 5.3 绑定工具到 LLM
 
 ```python
-from langchain.llms import OpenAI
-from langchain.agents import initialize_agent, AgentType
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_agent, AgentType
 
-llm = OpenAI(temperature=0)
+llm = ChatOpenAI(temperature=0)
 
 # 初始化 Agent
-agent = initialize_agent(
+agent = create_agent(
     tools=[calculate, get_current_time],
     llm=llm,
     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
@@ -464,7 +464,7 @@ Day 2: 第一个带工具的 Agent
 
 import os
 from langchain_openai import ChatOpenAI
-from langchain.agents import initialize_agent, AgentType
+from langchain.agents import create_agent, AgentType
 from langchain.tools import Tool
 from langchain_community.tools import DuckDuckGoSearchRun
 
@@ -522,7 +522,7 @@ tools = [
 ]
 
 # 4. 初始化 Agent
-agent = initialize_agent(
+agent = create_agent(
     tools,
     llm,
     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
@@ -577,10 +577,10 @@ python search_agent.py
 
 ```python
 # 启用详细日志
-agent = initialize_agent(
+agent = create_agent(
     tools,
     llm,
-    agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     verbose=True,          # 打印完整过程
     handle_parsing_errors=True  # 处理解析错误
 )
@@ -589,10 +589,10 @@ agent = initialize_agent(
 def custom_error_handler(error):
     return f"出错了，请重试。错误信息：{error}"
 
-agent = initialize_agent(
+agent = create_agent(
     tools,
     llm,
-    agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     handle_parsing_errors=custom_error_handler
 )
 ```
@@ -602,22 +602,33 @@ agent = initialize_agent(
 ## ✅ 完成检查清单
 
 ### 理论部分
-- [ ] 理解 Agent 核心组件（LLM, Memory, Tools, Planning）
-- [ ] 掌握 ReAct 设计模式
-- [ ] 能区分 Agent 和普通 LLM 调用
-- [ ] 理解 Agent 决策循环
+- [x] 理解 Agent 核心组件（LLM, Memory, Tools, Planning）
+- [x] 掌握 ReAct 设计模式
+- [x] 能区分 Agent 和普通 LLM 调用
+- [x] 理解 Agent 决策循环
 
 ### 实践部分
-- [ ] LangChain 环境搭建完成
-- [ ] 会使用 Prompt Templates
-- [ ] 会创建自定义 Tools
-- [ ] 能初始化 Agent
-- [ ] Agent 能调用工具完成实际任务
+- [x] LangChain 环境搭建完成
+- [x] 会使用 Prompt Templates
+- [x] 会创建自定义 Tools
+- [x] 能初始化 Agent
+- [x] Agent 能调用工具完成实际任务
 
 ### 代码提交
-- [ ] 搜索 Agent 代码完成
-- [ ] 测试通过
-- [ ] 提��到 Git
+- [x] 搜索 Agent 代码完成
+- [x] 测试通过
+- [x] 提交到 Git
+
+### 📌 组件学习进度
+
+Day 2 完成了 **LLM** 和 **Tools** 的学习，另外两个组件在后续天数：
+
+| 组件 | 状态 | 详细学习 |
+|------|------|---------|
+| LLM | ✅ 已学 | Day 2 - LangChain 基础 |
+| Tools | ✅ 已学 | Day 2 - Tools 工具系统 |
+| Memory | 📅 待学 | Day 3 - 记忆系统与 RAG 基础 |
+| Planning | 📅 待学 | Day 8 - Agent 规划能力 |
 
 ---
 
@@ -636,12 +647,17 @@ agent = initialize_agent(
 - 计算器：数学运算
 - 天气查询：API 调用示例
 
+### 踩坑记录
+1. langchain 的 `OpenAI` 与 `ChatOpenAI` 接入端点不通。
+ OpenAI 类（调用 /completions 端点），但 MiniMax chat 模型需要用 ChatOpenAI（调用 /chat/completions 端点）。
+
 ### 思考
 Agent 的优势在于能主动调用工具减少幻觉，
 但也增加了复杂度和调试难度。
 
 ### 明日改进
-- 
+- ReAct 源论文需要再看一遍
+- 阅读 LangChain 开发文档
 ```
 
 ---
@@ -706,5 +722,218 @@ A: 替换 `ChatOpenAI` 为 `ChatAnthropic`、`ChatCohere` 等。
 
 ---
 
-**最后更新**: 2026-04-01  
-**版本**: 2.0 (深入学习版)
+## 🚀 进阶阅读：其他 Agent 设计模式
+
+> 📚 学习完 ReAct 之后，了解其他主流设计模式有助于在不同场景下选择合适的方案。
+
+### 1. Plan-and-Execute（计划-执行）
+
+**核心思想**：先规划所有步骤，再按顺序执行。适合复杂任务的分解和执行。
+
+```
+问题 → 规划步骤 → [步骤1] → [步骤2] → [步骤3] → 完成
+```
+
+**优点**：
+- 任务分解清晰，可控性强
+- 便于人工审核中间步骤
+- 适合长周期复杂任务
+
+**代码示例**：
+```python
+def plan_and_execute(task, llm, tools):
+    # 1. 规划阶段
+    plan = llm.generate(f"分解任务：{task}")
+    
+    # 2. 执行阶段
+    results = []
+    for step in plan.steps:
+        result = execute_step(step, tools)
+        results.append(result)
+    
+    # 3. 汇总结果
+    return summarize(results)
+```
+
+**适用场景**：需要提前规划、数据处理流水线、报告生成
+
+---
+
+### 2. Self-Ask（自我追问）
+
+**核心思想**：模型自己提出子问题，逐步分解，逐步回答。
+
+```
+Q: 主要问题是什么？
+→ 子问题1：需要先知道什么？
+→ 回答子问题1
+→ 子问题2：...
+→ ... → 最终答案
+```
+
+**优点**：
+- 强制模型展开思考过程
+- 自然分解复杂问题
+- 可解释性强
+
+**代码示例**：
+```python
+def self_ask_agent(question, llm):
+    history = []
+    current_q = question
+    
+    while not is_answered(current_q):
+        # 模型自己提出子问题
+        sub_q = llm.generate(f"这个问题：{current_q}，需要先回答什么？")
+        answer = llm.generate(f"回答：{sub_q}")
+        history.append({"q": sub_q, "a": answer})
+        
+        # 基于子问题答案更新理解
+        current_q = llm.generate(f"基于 {history}，如何回答 {question}？")
+    
+    return current_q
+```
+
+**适用场景**：研究型问答、复杂逻辑推理、需要多角度分析的问题
+
+---
+
+### 3. Tree of Thoughts (ToT)（思维树）
+
+**核心思想**：探索多条思维路径，树状结构，可回溯。
+
+```
+         问题
+       /  |  \
+    路径A 路径B  路径C
+     |     |      |
+    ...   ...    ...
+     \     |     /
+      \    |    /
+       最优路径
+```
+
+**优点**：
+- 探索多种解决方案
+- 支持回溯和剪枝
+- 适合需要搜索的问题
+
+**适用场景**：战略规划、复杂问题求解、需要探索多种可能性的任务
+
+---
+
+### 4. Hierarchical Agents（层级 Agent）
+
+**核心思想**：多个专门 Agent 由一个 Supervisor 协调。
+
+```
+        Supervisor Agent
+       /      |      \
+  Search   Calculator  Writer
+  Agent     Agent     Agent
+```
+
+**优点**：
+- 专业化分工
+- 可并行执行独立任务
+- 易于扩展
+
+**代码示例**：
+```python
+# Supervisor 负责分配任务
+def supervisor(task, llm, sub_agents):
+    plan = llm.generate(f"分解任务 {task}，分配给子Agent")
+    
+    # 并行执行
+    results = parallel_execute(plan.subtasks, sub_agents)
+    
+    # Supervisor 汇总
+    return llm.generate(f"汇总结果：{results}")
+```
+
+**适用场景**：复杂多职能任务、需要并行处理、内容生成流水线
+
+---
+
+### 5. Reflexion（反思）
+
+**核心思想**：执行后进行自我反思，决定是否重试。
+
+```
+执行 → 观察结果 → 反思：是否正确？
+       ↓ 是                    ↓ 否
+       完成 ←── 重试 ←───── 调整策略
+```
+
+**优点**：
+- 自动纠错
+- 持续改进
+- 减少失败率
+
+**代码示例**：
+```python
+def reflexion_agent(task, llm, tools, max_retries=3):
+    for attempt in range(max_retries):
+        result = execute_task(task, tools)
+        
+        # 反思结果
+        reflection = llm.generate(f"评估结果 {result}，是否有问题？")
+        
+        if reflection.is_correct:
+            return result
+        
+        # 调整策略
+        task = reflection.adjust(task)
+    
+    return "达到最大重试次数"
+```
+
+**适用场景**：需要高可靠性的任务、自我改进系统、复杂调试场景
+
+---
+
+### 6. Module RAG（检索增强 Agent）
+
+**核心思想**：决策时从知识库检索相关信息，增强推理能力。
+
+```
+用户问题 → 检索知识库 → 结合上下文 → LLM 推理 → 执行 → 响应
+              ↑
+         外部知识库
+```
+
+**优点**：
+- 减少幻觉
+- 基于真实信息回答
+- 可更新知识库
+
+**适用场景**：专业领域问答、需要最新信息的任务、客服系统
+
+---
+
+### 7. 模式对比总结
+
+| 模式 | 核心特点 | 适用场景 | 复杂度 |
+|------|---------|---------|-------|
+| **ReAct** | 推理+行动交替 | 工具调用、动态决策 | ⭐⭐ |
+| **Plan-and-Execute** | 先规划后执行 | 复杂流水线、长任务 | ⭐⭐ |
+| **Self-Ask** | 自我追问分解 | 复杂推理、研究问答 | ⭐⭐ |
+| **ToT** | 多路径探索 | 战略规划、搜索问题 | ⭐⭐⭐ |
+| **Hierarchical** | 多Agent协作 | 复杂多职能任务 | ⭐⭐⭐ |
+| **Reflexion** | 执行+反思 | 高可靠性任务 | ⭐⭐⭐ |
+| **Module RAG** | 检索增强 | 知识密集型任务 | ⭐⭐ |
+
+---
+
+### 进阶阅读材料
+
+1. **[Plan-and-Execute 论文](https://arxiv.org/abs/2305.04091)** - 计划与执行分离的Agent架构
+2. **[Self-Ask 论文](https://arxiv.org/abs/2210.03629)** - 继 ReAct 之后的追问式方法
+3. **[Tree of Thoughts 论文](https://arxiv.org/abs/2305.10601)** - 多路径思维探索
+4. **[Reflexion 论文](https://arxiv.org/abs/2303.11366)** - 语言 Agent 的自我反思
+5. **[LLM Agent 综述](https://arxiv.org/abs/2309.07864)** - 各种 Agent 模式总结
+
+---
+
+**最后更新**: 2026-04-03
+**版本**: 2.0 (深入学习版) → ✅ 已完成
